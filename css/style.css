@@ -515,6 +515,8 @@ ol.type li a:hover {
 }
 .portfolio-item {
   margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .portfolio-item .hover-bg {
