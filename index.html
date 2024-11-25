@@ -630,7 +630,7 @@
                         type="text"
                         name="phone"
                         id="phone"
-                        placeholder="(319) 555-0115"
+                        placeholder="+6285 xxxxx"
                         class="formbold-form-input"
                         required
                       />
@@ -924,39 +924,79 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-          document.getElementById("contactForm").addEventListener("submit", function(event) {
-              event.preventDefault(); // Mencegah submit form default
-  
-              // Ambil data dari form
-              const firstName = document.getElementById("firstname").value;
-              const lastName = document.getElementById("lastname").value;
-              const email = document.getElementById("email").value;
-              const phone = document.getElementById("phone").value;
-              const message = document.getElementById("message").value;
-  
-              // Ambil opsi yang dipilih dari radio button atau dropdown
-              let jobTitle = "";
-              const selectedRadio = document.querySelector('input[name="jobtitle"]:checked');
-              const selectedDropdown = document.getElementById("jobtitle-mobile");
-  
-              if (selectedRadio) {
-                  jobTitle = selectedRadio.parentElement.textContent.trim();
-              } else if (selectedDropdown && selectedDropdown.value) {
-                  jobTitle = selectedDropdown.options[selectedDropdown.selectedIndex].text.trim();
-              } else {
-                  jobTitle = "Tidak disebutkan";
-              }
-  
-              // Format pesan untuk WhatsApp
-              const whatsappNumber = "6287844632335"; // Ganti dengan nomor WhatsApp Anda
-              const text = `Halo, saya ${firstName} ${lastName}!%0AEmail: ${email}%0ATelepon: ${phone}%0AKebutuhan: ${jobTitle}%0APesan: ${message}`;
-  
-              // Redirect ke WhatsApp
-              const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
-              window.open(whatsappURL, "_blank");
+        const form = document.getElementById("contactForm");
+        const radioButtons = document.querySelectorAll('.formbold-input-radio');
+        const dropdown = document.getElementById("jobtitle-mobile");
+
+        function handleRequiredAttribute() {
+          const isMobile = window.innerWidth <= 768;
+
+          radioButtons.forEach(radio => {
+            if (isMobile) {
+              radio.removeAttribute('required'); // Hapus required di layar kecil
+            } else {
+              radio.setAttribute('required', 'true'); // Tambahkan kembali di layar besar
+            }
           });
+        }
+
+        // Jalankan saat halaman dimuat
+        handleRequiredAttribute();
+
+        // Jalankan setiap kali ukuran layar berubah
+        window.addEventListener('resize', handleRequiredAttribute);
+
+        // Validasi Form dan Kirim ke WhatsApp
+        form.addEventListener("submit", function(event) {
+          event.preventDefault(); // Cegah pengiriman form default
+          const isMobile = window.innerWidth <= 768;
+          const selectedRadio = document.querySelector('input[name="jobtitle"]:checked');
+          const selectedDropdown = dropdown.value;
+
+          const firstName = document.getElementById("firstname").value;
+          const lastName = document.getElementById("lastname").value;
+          const email = document.getElementById("email").value;
+          const phone = document.getElementById("phone").value;
+          const message = document.getElementById("message").value; // Gunakan .value untuk mendapatkan isi teks
+
+          let jobtitle = "";
+
+          if (isMobile) {
+            if (!selectedDropdown) {
+              alert("Please select an option from the dropdown.");
+              return;
+            }
+            jobtitle = selectedDropdown;
+          } else {
+            if (!selectedRadio) {
+              alert("Please select an option from the radio buttons.");
+              return;
+            }
+            jobtitle = selectedRadio.value;
+          }
+
+          // Kirim ke WhatsApp
+          sendToWhatsApp(firstName, lastName, email, phone, message, jobtitle);
+        });
+
+        // Fungsi untuk mengirim data ke WhatsApp
+        function sendToWhatsApp(firstName, lastName, email, phone, message, jobtitle) {
+          const phoneNumber = "6287844632335"; // Ganti dengan nomor WhatsApp tujuan
+          const pesan = `
+      Hallo,
+      Nama: ${firstName} ${lastName}
+      Email: ${email}
+      Nomor HP: ${phone}
+      Kebutuhan project untuk: ${jobtitle}
+      Pesan: ${message}
+          `;
+
+          const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(pesan)}`;
+          window.open(url, '_blank'); // Buka URL WhatsApp di tab baru
+        }
       });
-  </script>
+
+    </script>
   
     
     
